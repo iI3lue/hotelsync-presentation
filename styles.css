@@ -1236,3 +1236,118 @@ section[data-title="Conclusiones y próximos pasos"] .closing-panels .mini-list 
   }
   .slide .reveal { animation: none !important; }
 }
+
+/* ---------- escala tipográfica: legibilidad en proyector ---------- */
+.cover-eyebrow, .brand-word { font-size: 12px; }
+.cover-title { font-size: 50px; }
+.cover-lead { max-width: 780px; font-size: 16px; }
+.avatar { font-size: 12px; }
+.member h3 { font-size: 14.5px; }
+.member p { font-size: 10px; letter-spacing: 0.1em; }
+.pills li { padding: 5px 12px; font-size: 12px; }
+.pill-link, .cta { font-size: 12.5px; }
+.pill-link svg, .cta svg { width: 15px; height: 15px; }
+
+.head-title { font-size: 18.5px; }
+.head-sub, .head-tag { font-size: 11px; }
+
+.panel-kicker { margin-bottom: 10px; font-size: 11px; }
+.problem-list li { padding: 9px 12px; }
+.problem-list h3, .role-list h3 { font-size: 15.5px; }
+.problem-list p, .role-list p { font-size: 14px; }
+.badge { width: 22px; height: 22px; font-size: 15px; }
+.role-initial { width: 28px; height: 28px; font-size: 12px; }
+.panel-note, .side-note { font-size: 13px; }
+
+.chain-label { font-size: 10.5px; }
+.chain > span:not(.chain-label) { font-size: 12px; }
+.flow-label { font-size: 10.5px; }
+.flow-items > span { font-size: 12px; }
+.flow-items code { font-size: 11px; }
+.svc { font-size: 11px; }
+.svc em { font-size: 9.5px; }
+.flow-arrow span { font-size: 9.5px; }
+
+.layer-list h3 { font-size: 15.5px; }
+.layer-list p { font-size: 14px; }
+.layer-list code { font-size: 12.5px; }
+.step { width: 24px; height: 24px; font-size: 11px; }
+
+.mini-list li { font-size: 13.5px; }
+.mini-list code { font-size: 12.5px; }
+.chip { padding: 6px 11px; font-size: 12px; }
+
+.goal-num { font-size: 24px; }
+.goal h3 { font-size: 15px; }
+.goal p { font-size: 13.5px; }
+.scope-list li { font-size: 13.5px; }
+.scope-list .mark { width: 16px; height: 16px; font-size: 10.5px; }
+
+.metric-value { font-size: 30px; }
+.metric-value em { font-size: 11px; }
+.metric-label { font-size: 9.5px; }
+
+.svc-card { padding: 8px 10px; }
+.svc-card-name { font-size: 13px; }
+.svc-card-port { font-size: 10.5px; }
+.svc-card p { font-size: 12.5px; }
+.svc-card-api, .svc-card-meta { font-size: 10px; }
+
+.prefix { font-size: 12.5px; }
+.prefix code { font-size: 11.5px; }
+.prefix span { font-size: 11px; }
+.cookie-table th { font-size: 10px; }
+.cookie-table td { font-size: 13px; }
+.cookie-table code { font-size: 12px; }
+
+.track-node h3 { font-size: 14px; }
+.track-node p { font-size: 12.5px; }
+.track-num { font-size: 9.5px; }
+.track-node code { font-size: 11.5px; }
+.track-arrow { font-size: 14px; }
+.ev-group b { font-size: 9.5px; }
+.ev-group code { font-size: 11.5px; }
+
+.step-item h3 { font-size: 14px; }
+.step-item p { font-size: 12.5px; }
+.step-item code { font-size: 11px; }
+.step-num { width: 22px; height: 22px; font-size: 10.5px; }
+.state-chip { font-size: 10.5px; }
+.state-flow span { font-size: 10px; }
+.state-flow i { font-size: 11px; }
+
+.data-table th { font-size: 9.5px; }
+.data-table td { font-size: 13px; }
+.data-table td:first-child { font-size: 12px; }
+.data-table td.ev { font-size: 11px; }
+
+.deploy-row { gap: 12px; padding: 5px 0; font-size: 12.5px; }
+.deploy-row--head { font-size: 9.5px; }
+.deploy-row > b { font-size: 12px; }
+.split-note { font-size: 11.5px; }
+
+.shot-tag { font-size: 9.5px; }
+.shot-path { font-size: 10px; }
+.shot-note { font-size: 12px; }
+.shot-placeholder b { font-size: 9.5px; }
+.shot-placeholder span { font-size: 10px; }
+.media-panel figcaption { font-size: 11.5px; }
+
+.statement p { font-size: 27px; }
+.statement span { font-size: 9px; }
+.link-chip { font-size: 12px; }
+.link-chip b { font-size: 10.5px; }
+.thanks { font-size: 19px; }
+/* slide 06 · ajuste fino para la escala grande */
+section[data-title="BFF y sesión"] .cookie-table th { padding-bottom: 4px; }
+section[data-title="BFF y sesión"] .cookie-table td { padding: 4px 0; }
+section[data-title="BFF y sesión"] .panel > .mini-list { gap: 5px; }
+section[data-title="BFF y sesión"] .panel > .mini-list > li { padding: 1px 0; }
+section[data-title="BFF y sesión"] .panel { padding: 14px 16px; }
+section[data-title="BFF y sesión"] .panel-kicker { margin-bottom: 6px; }
+section[data-title="BFF y sesión"] .panel-note { margin-top: 8px; padding: 7px 10px; font-size: 12.5px; }
+section[data-title="BFF y sesión"] .chips { gap: 5px; }
+section[data-title="BFF y sesión"] .cookie-table td { padding: 3px 0; }
+.closing-panels .mini-list li { font-size: 13.5px; }
+.closing { grid-template-rows: minmax(0, 1fr) auto auto; }
+.pills { max-width: 800px; }
