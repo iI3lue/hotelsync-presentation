@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HotelSync — Arquitectura de una plataforma hotelera modular</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <symbol id="hs-mark" viewBox="0 0 40 40">
+        <rect x="1.2" y="1.2" width="37.6" height="37.6" rx="10" fill="none" stroke="currentColor" stroke-width="1.6"></rect>
+        <path d="M20 8.6 31.4 20 20 31.4 8.6 20Z" fill="none" stroke="currentColor" stroke-width="1.4"></path>
+        <circle cx="20" cy="20" r="2.4" fill="currentColor"></circle>
+      </symbol>
+      <symbol id="i-chevron-left" viewBox="0 0 24 24">
+        <path d="M15 6 9 12l6 6"></path>
+      </symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24">
+        <path d="m9 6 6 6-6 6"></path>
+      </symbol>
+      <symbol id="i-arrow-right" viewBox="0 0 24 24">
+        <path d="M5 12h14M13 6l6 6-6 6"></path>
+      </symbol>
+      <symbol id="i-rotate" viewBox="0 0 24 24">
+        <path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v5h-5"></path>
+      </symbol>
+    </defs>
+  </svg>
+
+  <main class="stage" id="stage">
+    <div class="progress" aria-hidden="true"><span id="progressFill"></span></div>
+
+    <div class="hud">
+      <button class="icon-btn" id="prevBtn" type="button" aria-label="Anterior" title="Anterior (←)">
+        <svg><use href="#i-chevron-left"></use></svg>
+      </button>
+      <span class="counter" id="counter">1 / 14</span>
+      <button class="next-btn" id="nextBtn" type="button">
+        <span id="nextLabel">Comenzar</span>
+        <svg><use href="#i-arrow-right"></use></svg>
+      </button>
+    </div>
+
+    <nav class="dots" id="dots" aria-label="Ir a diapositiva"></nav>
+
+    <button class="home" id="homeBtn" type="button">Portada</button>
+
+    <!-- 1 · Portada -->
+    <section class="slide slide--cover is-active" data-title="Portada">
+      <div class="glow glow--a"></div>
+      <div class="glow glow--b"></div>
+      <div class="cover-inner">
+        <div class="brand-lockup reveal" style="--d:0">
+          <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="brand-word">HotelSync</span>
+        </div>
+
+        <p class="cover-eyebrow reveal" style="--d:1">Universidad Cooperativa de Colombia · Arquitectura de Plataformas Tecnológicas</p>
+        <h1 class="cover-title reveal" style="--d:2">Un PMS modular para<br><em>hotelería independiente</em></h1>
+        <p class="cover-lead reveal" style="--d:3">
+          Once microservicios, once bases de datos y un catálogo de eventos para sostener el ciclo completo
+          de una reserva: buscar, reservar, pagar, llegar, salir y facturar.
+        </p>
+
+        <div class="team reveal" style="--d:4">
+          <article class="member">
+            <div class="avatar">JD</div>
+            <h3>Juan Diego Díaz</h3>
+            <p>Arquitectura</p>
+          </article>
+          <article class="member">
+            <div class="avatar">MC</div>
+            <h3>María Ángel Correa</h3>
+            <p>DevOps y calidad</p>
+          </article>
+          <article class="member">
+            <div class="avatar">JH</div>
+            <h3>Juan Pablo Hernández</h3>
+            <p>Backend</p>
+          </article>
+          <article class="member">
+            <div class="avatar">MB</div>
+            <h3>Marleidys Bautista</h3>
+            <p>Frontend</p>
+          </article>
+        </div>
+
+        <ul class="pills reveal" style="--d:5">
+          <li>11 servicios</li>
+          <li>PostgreSQL por servicio</li>
+          <li>Outbox + RabbitMQ</li>
+          <li>Next.js + BFF</li>
+          <li>Render · Neon · Vercel</li>
+        </ul>
+
+        <div class="cover-cta reveal" style="--d:6">
+          <a class="cta" href="https://hotelsync-front.vercel.app" target="_blank" rel="noreferrer">
+            <svg><use href="#i-rotate"></use></svg>
+            Ver la demo
+          </a>
+          <a class="pill-link" href="https://github.com/iI3lue" target="_blank" rel="noreferrer">
+            <svg><use href="#hs-mark"></use></svg>
+            github.com/iI3lue
+          </a>
+          <span class="pill-link">
+            <svg><use href="#i-arrow-right"></use></svg>
+            14 diapositivas · 5 momentos
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · Contexto y problema -->
+    <section class="slide" data-title="Contexto y problema">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Contexto y problema</h2>
+            <p class="head-sub">Momento 1 de 5 — El punto de partida</p>
+          </div>
+        </div>
+        <span class="head-tag">Hotel independiente</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="cols cols--2">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Lo que hoy duele</p>
+            <ul class="problem-list">
+              <li>
+                <span class="badge badge--bad">!</span>
+                <div>
+                  <h3>Inventario en hojas de cálculo</h3>
+                  <p>Dos canales venden la misma habitación y la sobreventa se descubre en el mostrador.</p>
+                </div>
+              </li>
+              <li>
+                <span class="badge badge--bad">!</span>
+                <div>
+                  <h3>Check-in y check-out manuales</h3>
+                  <p>Llegadas, folios y facturas sin trazabilidad; nadie sabe quién cambió qué.</p>
+                </div>
+              </li>
+              <li>
+                <span class="badge badge--bad">!</span>
+                <div>
+                  <h3>Limpieza sin cola</h3>
+                  <p>Las tareas se dan de viva voz; la habitación sucia aparece cuando el huésped ya llegó.</p>
+                </div>
+              </li>
+              <li>
+                <span class="badge badge--bad">!</span>
+                <div>
+                  <h3>Gerencia a ciegas</h3>
+                  <p>Ocupación, ADR y RevPAR se calculan al cierre de mes, cuando ya no se puede reaccionar.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">Quién lo vive</p>
+            <ul class="role-list">
+              <li>
+                <span class="role-initial">H</span>
+                <div>
+                  <h3>Huésped</h3>
+                  <p>Quiere ver disponibilidad real y reservar sin llamar ni esperar respuesta por correo.</p>
+                </div>
+              </li>
+              <li>
+                <span class="role-initial">R</span>
+                <div>
+                  <h3>Recepción</h3>
+                  <p>Necesita la lista de llegadas confirmadas y un check-in que no se pueda duplicar.</p>
+                </div>
+              </li>
+              <li>
+                <span class="role-initial">A</span>
+                <div>
+                  <h3>Ama de llaves</h3>
+                  <p>Requiere una cola por hotel, priorizada por salida, sin tareas de otros hoteles.</p>
+                </div>
+              </li>
+              <li>
+                <span class="role-initial">G</span>
+                <div>
+                  <h3>Gerencia</h3>
+                  <p>Quiere ocupación, ADR y RevPAR del día, no un consolidado del mes anterior.</p>
+                </div>
+              </li>
+            </ul>
+            <p class="panel-note">Un solo sistema debe responder a los cuatro roles sin compartir una única base: cada uno mira datos de distinto dueño.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · Arquitectura general -->
+    <section class="slide" data-title="Arquitectura general">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Arquitectura general</h2>
+            <p class="head-sub">Momento 1 de 5 — Vista de capas</p>
+          </div>
+        </div>
+        <span class="head-tag">Borde · dominio · datos</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="cols cols--media">
+          <div class="stack-col reveal" style="--d:0">
+            <ul class="layer-list">
+              <li>
+                <span class="step">1</span>
+                <div>
+                  <h3>Experiencia</h3>
+                  <p>Next.js con App Router: sitio público, <code>/admin</code> por rol y simulador de canal. Las cookies son HttpOnly; el navegador nunca ve el token de acceso.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step">2</span>
+                <div>
+                  <h3>Borde</h3>
+                  <p>BFF propio en <code>/api/*</code> y un <code>api-gateway</code> sin estado que enruta por once prefijos, aplica límites y regenera el identificador de petición.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step">3</span>
+                <div>
+                  <h3>Dominio</h3>
+                  <p>Once servicios Express + TypeScript con el flujo <code>route → controller → service</code>. Zod valida en el borde y los errores salen como <code>{ error }</code>.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step">4</span>
+                <div>
+                  <h3>Datos</h3>
+                  <p>Una base PostgreSQL por servicio, RabbitMQ para lo que puede esperar, Redis para caché de tarifas y réplicas de lectura para analytics.</p>
+                </div>
+              </li>
+            </ul>
+            <p class="side-note">La regla que ordena todo: un servicio escribe solo su base. Lo que otro necesita llega por HTTP interno o por evento, nunca por un join.</p>
+          </div>
+
+          <figure class="media-panel media-panel--flow reveal" style="--d:2">
+            <div class="flow">
+              <div class="flow-band">
+                <p class="flow-label">Clientes</p>
+                <div class="flow-items">
+                  <span>Huésped</span>
+                  <span>Recepción</span>
+                  <span>Housekeeping</span>
+                  <span>Gerencia</span>
+                  <span>Simulador OTA</span>
+                </div>
+              </div>
+              <div class="flow-arrow"><span>HTTPS · JWT en cookie</span></div>
+              <div class="flow-band flow-band--gateway">
+                <p class="flow-label">api-gateway · 11 prefijos</p>
+                <div class="flow-items">
+                  <span><code>/property</code></span>
+                  <span><code>/rate</code></span>
+                  <span><code>/users</code></span>
+                  <span><code>/booking</code></span>
+                  <span><code>/front-desk</code></span>
+                  <span><code>/housekeeping</code></span>
+                  <span><code>/billing</code></span>
+                  <span><code>/payments</code></span>
+                  <span><code>/loyalty</code></span>
+                  <span><code>/channel</code></span>
+                  <span><code>/analytics</code></span>
+                </div>
+              </div>
+              <div class="flow-arrow"><span>x-service-key · timeout 45 s</span></div>
+              <div class="flow-band flow-band--services">
+                <p class="flow-label">Dominio · 11 servicios</p>
+                <div class="svc-grid">
+                  <span class="svc">property <em>3001</em></span>
+                  <span class="svc">rate <em>3002</em></span>
+                  <span class="svc">user <em>3003</em></span>
+                  <span class="svc">booking <em>3004</em></span>
+                  <span class="svc">front-desk <em>3005</em></span>
+                  <span class="svc">housekeeping <em>3006</em></span>
+                  <span class="svc">billing <em>3007</em></span>
+                  <span class="svc">channel <em>3008</em></span>
+                  <span class="svc">loyalty <em>3009</em></span>
+                  <span class="svc">payment <em>3010</em></span>
+                  <span class="svc">analytics <em>3011</em></span>
+                </div>
+              </div>
+              <div class="flow-arrow"><span>outbox · eventos</span></div>
+              <div class="flow-band">
+                <p class="flow-label">Datos</p>
+                <div class="flow-items">
+                  <span>11 bases PostgreSQL</span>
+                  <span>hotelsync.events</span>
+                  <span>Redis</span>
+                  <span>réplicas read-only</span>
+                </div>
+              </div>
+            </div>
+            <figcaption>Camino de una petición: del navegador al servicio dueño del dato.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · Objetivos y alcance -->
+    <section class="slide" data-title="Objetivos y alcance">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Objetivos y alcance</h2>
+            <p class="head-sub">Momento 1 de 5 — Qué resuelve y qué no</p>
+          </div>
+        </div>
+        <span class="head-tag">Alcance declarado</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="plan-layout">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Cuatro objetivos</p>
+            <ul class="goal-list">
+              <li class="goal">
+                <span class="goal-num">01</span>
+                <div>
+                  <h3>Cubrir el ciclo de la reserva</h3>
+                  <p>Buscar, reservar, pagar, llegar, salir y facturar dentro de un mismo sistema y con la misma identidad.</p>
+                </div>
+              </li>
+              <li class="goal">
+                <span class="goal-num">02</span>
+                <div>
+                  <h3>Hacer explícitos los límites</h3>
+                  <p>Una base por servicio, sin joins ni claves foráneas cruzadas; el contrato vive en el borde.</p>
+                </div>
+              </li>
+              <li class="goal">
+                <span class="goal-num">03</span>
+                <div>
+                  <h3>Tolerar fallos parciales</h3>
+                  <p>Outbox, reintentos acotados y cola de descarte: el check-out no se cae porque falle la factura.</p>
+                </div>
+              </li>
+              <li class="goal">
+                <span class="goal-num">04</span>
+                <div>
+                  <h3>Operar con costo cero</h3>
+                  <p>Once servicios en free tier, con datos reales y una demo pública que se pueda mostrar en vivo.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="stack-col stack-col--tight reveal" style="--d:2">
+            <div class="panel">
+              <p class="panel-kicker">Dentro</p>
+              <ul class="scope-list">
+                <li><span class="mark mark--yes">✓</span> Reserva de huésped con pago simulado y confirmación</li>
+                <li><span class="mark mark--yes">✓</span> Recepción, housekeeping y tablero de gerencia por rol</li>
+                <li><span class="mark mark--yes">✓</span> Once servicios, gateway, BFF y analítica diaria</li>
+                <li><span class="mark mark--yes">✓</span> Eventos canónicos con outbox e idempotencia</li>
+                <li><span class="mark mark--yes">✓</span> Despliegue real en Render, Neon y Vercel</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <p class="panel-kicker">Fuera</p>
+              <ul class="scope-list">
+                <li><span class="mark mark--no">–</span> Pasarela de pago real y conciliación bancaria</li>
+                <li><span class="mark mark--no">–</span> Conexión certificada con Booking o Expedia</li>
+                <li><span class="mark mark--no">–</span> Alta disponibilidad, multi-región y staging</li>
+                <li><span class="mark mark--no">–</span> Facturación electrónica ante la DIAN</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="metric-row reveal" style="--d:4">
+            <div class="metric">
+              <span class="metric-value">11</span>
+              <span class="metric-label">servicios desplegados</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">41</span>
+              <span class="metric-label">modelos Prisma</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">13</span>
+              <span class="metric-label">eventos canónicos</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">399</span>
+              <span class="metric-label">pruebas backend</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · Catálogo de servicios -->
+    <section class="slide" data-title="Catálogo de servicios">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Catálogo de servicios</h2>
+            <p class="head-sub">Momento 2 de 5 — Once servicios, once dueños de dato</p>
+          </div>
+        </div>
+        <span class="head-tag">Puertos 3001–3011</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="catalog-layout">
+          <div class="svc-cards">
+            <article class="svc-card reveal" style="--d:0">
+              <div class="svc-card-head"><span class="svc-card-name">property</span><span class="svc-card-port">:3001</span></div>
+              <p>Hoteles, habitaciones físicas y tipos.</p>
+              <span class="svc-card-api">/api/property</span>
+              <span class="svc-card-meta">5 modelos · publica 1</span>
+            </article>
+            <article class="svc-card reveal" style="--d:1">
+              <div class="svc-card-head"><span class="svc-card-name">rate-availability</span><span class="svc-card-port">:3002</span></div>
+              <p>Inventario, tarifas y disponibilidad; el árbitro del stock.</p>
+              <span class="svc-card-api">/api/rate</span>
+              <span class="svc-card-meta">6 modelos · publica 2</span>
+            </article>
+            <article class="svc-card reveal" style="--d:2">
+              <div class="svc-card-head"><span class="svc-card-name">user</span><span class="svc-card-port">:3003</span></div>
+              <p>Identidad, roles, sesiones y personal del hotel.</p>
+              <span class="svc-card-api">/api/users</span>
+              <span class="svc-card-meta">5 modelos</span>
+            </article>
+            <article class="svc-card svc-card--hub reveal" style="--d:3">
+              <div class="svc-card-head"><span class="svc-card-name">booking</span><span class="svc-card-port">:3004</span></div>
+              <p>El ciclo de la reserva y su outbox transaccional.</p>
+              <span class="svc-card-api">/api/booking</span>
+              <span class="svc-card-meta">3 modelos · publica 4</span>
+            </article>
+            <article class="svc-card reveal" style="--d:4">
+              <div class="svc-card-head"><span class="svc-card-name">front-desk</span><span class="svc-card-port">:3005</span></div>
+              <p>Llegadas, check-in y check-out sin duplicados.</p>
+              <span class="svc-card-api">/api/front-desk</span>
+              <span class="svc-card-meta">4 modelos · publica 2</span>
+            </article>
+            <article class="svc-card reveal" style="--d:5">
+              <div class="svc-card-head"><span class="svc-card-name">housekeeping</span><span class="svc-card-port">:3006</span></div>
+              <p>Cola de limpieza por hotel y prioridad por salida.</p>
+              <span class="svc-card-api">/api/housekeeping</span>
+              <span class="svc-card-meta">2 modelos · consume 1</span>
+            </article>
+            <article class="svc-card reveal" style="--d:6">
+              <div class="svc-card-head"><span class="svc-card-name">billing</span><span class="svc-card-port">:3007</span></div>
+              <p>Folios, cargos y factura al cerrar la estadía.</p>
+              <span class="svc-card-api">/api/billing</span>
+              <span class="svc-card-meta">4 modelos · publica 1</span>
+            </article>
+            <article class="svc-card reveal" style="--d:7">
+              <div class="svc-card-head"><span class="svc-card-name">channel-manager</span><span class="svc-card-port">:3008</span></div>
+              <p>Canales OTA, reservas externas y snapshots.</p>
+              <span class="svc-card-api">/api/channel</span>
+              <span class="svc-card-meta">4 modelos · consume 5</span>
+            </article>
+            <article class="svc-card reveal" style="--d:8">
+              <div class="svc-card-head"><span class="svc-card-name">loyalty</span><span class="svc-card-port">:3009</span></div>
+              <p>Puntos, niveles y reversos idempotentes.</p>
+              <span class="svc-card-api">/api/loyalty</span>
+              <span class="svc-card-meta">3 modelos · consume 3</span>
+            </article>
+            <article class="svc-card reveal" style="--d:9">
+              <div class="svc-card-head"><span class="svc-card-name">payment</span><span class="svc-card-port">:3010</span></div>
+              <p>Pasarela simulada, transacciones y reembolsos.</p>
+              <span class="svc-card-api">/api/payments</span>
+              <span class="svc-card-meta">2 modelos · publica 2</span>
+            </article>
+            <article class="svc-card reveal" style="--d:10">
+              <div class="svc-card-head"><span class="svc-card-name">analytics</span><span class="svc-card-port">:3011</span></div>
+              <p>ETL diario idempotente y tablero de revenue.</p>
+              <span class="svc-card-api">/api/analytics</span>
+              <span class="svc-card-meta">3 modelos · publica 1</span>
+            </article>
+            <article class="svc-card svc-card--total reveal" style="--d:11">
+              <div class="svc-card-head"><span class="svc-card-name">total</span><span class="svc-card-port">11</span></div>
+              <p>41 modelos, 13 eventos y 9 colas en un solo exchange.</p>
+              <span class="svc-card-api">hotelsync.events</span>
+              <span class="svc-card-meta">7 publican · 8 consumen</span>
+            </article>
+          </div>
+
+          <div class="chain reveal" style="--d:12">
+            <span class="chain-label">Cadena crítica</span>
+            <span>Búsqueda</span>
+            <span>Reserva pending</span>
+            <span>Pago</span>
+            <span>booking.confirmed</span>
+            <span>Llegada</span>
+            <span>Check-in</span>
+            <span>Check-out</span>
+            <span>Limpieza · folio · puntos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · BFF y sesión -->
+    <section class="slide" data-title="BFF y sesión">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">BFF y sesión</h2>
+            <p class="head-sub">Momento 2 de 5 — El borde de la aplicación</p>
+          </div>
+        </div>
+        <span class="head-tag">Next.js · cookies HttpOnly</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="body-grid">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Rutas del BFF</p>
+            <div class="prefix-grid">
+              <div class="prefix"><code>/api/property</code><span>property</span></div>
+              <div class="prefix"><code>/api/rate</code><span>rate-availability</span></div>
+              <div class="prefix"><code>/api/users</code><span>user</span></div>
+              <div class="prefix"><code>/api/booking</code><span>booking</span></div>
+              <div class="prefix"><code>/api/front-desk</code><span>front-desk</span></div>
+              <div class="prefix"><code>/api/housekeeping</code><span>housekeeping</span></div>
+              <div class="prefix"><code>/api/billing</code><span>billing</span></div>
+              <div class="prefix"><code>/api/channel</code><span>channel-manager</span></div>
+              <div class="prefix"><code>/api/loyalty</code><span>loyalty</span></div>
+              <div class="prefix"><code>/api/payments</code><span>payment</span></div>
+              <div class="prefix"><code>/api/analytics</code><span>analytics</span></div>
+              <div class="prefix"><code>/api/auth/*</code><span>rutas propias del BFF</span></div>
+            </div>
+            <p class="panel-kicker" style="margin-top:18px">Qué agrega el BFF</p>
+            <ul class="mini-list">
+              <li><b>Contrato</b> estable en JSON: el front no conoce puertos ni rutas internas.</li>
+              <li><b>Credenciales</b> fuera del navegador: Bearer y secretos viajan solo en el servidor.</li>
+              <li><b>Errores</b> del servicio dueño con su código, sin filtrar detalles internos.</li>
+              <li><b>Auth0</b>: completa el login federado y devuelve la cookie HttpOnly.</li>
+            </ul>
+            <p class="panel-note">El middleware inyecta el Bearer desde la cookie y añade <code>x-gateway-secret</code> y <code>x-client-ip</code>; el navegador nunca habla con el gateway.</p>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">Sesión y preferencias</p>
+            <table class="cookie-table">
+              <thead>
+                <tr><th>Cookie</th><th>Contenido</th><th>Vida</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>hs_access</code></td>
+                  <td>JWT de acceso, HttpOnly y SameSite Lax</td>
+                  <td>15 min</td>
+                </tr>
+                <tr>
+                  <td><code>hs_refresh</code></td>
+                  <td>Token de refresco con rotación</td>
+                  <td>7 días o sesión</td>
+                </tr>
+                <tr>
+                  <td><code>hs_remember</code></td>
+                  <td>Si el usuario pidió recordar la sesión</td>
+                  <td>7 días</td>
+                </tr>
+                <tr>
+                  <td><code>theme</code></td>
+                  <td>Preferencia de tema; no es credencial</td>
+                  <td>persistente</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="panel-note">El refresco es single-flight en <code>/api/auth/refresh</code>: varias peticiones simultáneas comparten una sola renovación.</p>
+            <p class="panel-kicker" style="margin-top:16px">Reglas de sesión</p>
+            <ul class="mini-list">
+              <li><b>Rotación</b>: cada refresco invalida el token anterior.</li>
+              <li><b>Logout</b>: borra ambas cookies y avisa al user-service.</li>
+              <li><b>401</b>: el cliente refresca una vez y reintenta la petición original.</li>
+              <li><b>Secure</b> en producción; SameSite Lax contra CSRF.</li>
+            </ul>
+            <p class="panel-kicker" style="margin-top:18px">Rutas por rol</p>
+            <div class="chips">
+              <span class="chip"><span class="dot dot--brass"></span>GUEST · /mis-reservas</span>
+              <span class="chip"><span class="dot dot--ink"></span>RECEPTIONIST · /admin/recepcion</span>
+              <span class="chip"><span class="dot dot--ink"></span>HOUSEKEEPER · /admin/housekeeping</span>
+              <span class="chip"><span class="dot dot--stone"></span>MANAGER · /admin/analytics</span>
+              <span class="chip"><span class="dot dot--stone"></span>SUPER_ADMIN · /admin</span>
+            </div>
+          </div>
+
+          <div class="chain reveal" style="--d:4">
+            <span class="chain-label">Camino de una petición</span>
+            <span>Navegador</span>
+            <span>/api/booking</span>
+            <span>middleware: Bearer + gateway secret + IP</span>
+            <span>api-gateway</span>
+            <span>booking-service</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · Seguridad en capas -->
+    <section class="slide" data-title="Seguridad en capas">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Seguridad en capas</h2>
+            <p class="head-sub">Momento 2 de 5 — Borde, token y datos</p>
+          </div>
+        </div>
+        <span class="head-tag">Hardening 16-nov</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="cols cols--2">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Gateway</p>
+            <ul class="mini-list">
+              <li><b>600/min</b> límite por IP; <code>/health</code> y <code>/metrics</code> exentos.</li>
+              <li><b>1 MiB</b> de cuerpo máximo; responde <code>413</code> al excederlo.</li>
+              <li><b>2048</b> caracteres de URL; responde <code>414</code> sin reenviar.</li>
+              <li><b>30 s</b> de <code>requestTimeout</code>; headers 20 s y keep-alive 5 s.</li>
+              <li><b>11 prefijos</b> declarativos, <code>x-request-id</code> regenerado y secretos internos descartados.</li>
+            </ul>
+            <p class="panel-note"><code>assertProductionSecrets()</code> corta el arranque si falta un secreto fuerte: sin <code>METRICS_TOKEN</code> o <code>x-gateway-secret</code> el servicio no levanta.</p>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">Servicios y credenciales</p>
+            <ul class="mini-list">
+              <li><b>20 / 15 min</b> intentos de login por IP; <b>5</b> por correo.</li>
+              <li><b>5/hora</b> registros por IP; el resto responde <code>429</code>.</li>
+              <li><b>nosniff</b>, <code>DENY</code> y <code>no-referrer</code> en todas las respuestas.</li>
+              <li><b>trust proxy</b> y <code>clientIp()</code>: la IP real, no la del proxy.</li>
+              <li><b>3 intentos</b> por evento con backoff 2 s / 15 s / 60 s y luego DLQ.</li>
+            </ul>
+            <p class="panel-note">Deuda honesta: el rate limit es en memoria, no distribuido; con más de una instancia hay que moverlo a Redis.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · Una base por servicio -->
+    <section class="slide" data-title="Una base por servicio">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Una base por servicio</h2>
+            <p class="head-sub">Momento 3 de 5 — Límites de datos</p>
+          </div>
+        </div>
+        <span class="head-tag">11 bases · 41 modelos</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="cols cols--2">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Aislamiento</p>
+            <ul class="mini-list">
+              <li><b>11</b> bases PostgreSQL 16, una por servicio y con su propio esquema Prisma.</li>
+              <li><b>41</b> modelos en total; la tabla <code>EventOutbox</code> es infraestructura, no dominio.</li>
+              <li><b>0</b> claves foráneas entre bases: el identificador compartido es un UUID.</li>
+              <li><b>Sin joins</b> cross-DB; la composición se hace en el BFF o por HTTP interno.</li>
+              <li><b>Read-only</b>: analytics lee réplicas con el rol <code>hotelsync_analytics_ro</code>.</li>
+            </ul>
+            <p class="panel-note">La integridad no la da una FK: la dan validación en el borde, claves de idempotencia y eventos.</p>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">Quién es dueño de qué</p>
+            <ul class="mini-list">
+              <li><b>Propiedad</b> → property; rate-availability guarda una proyección de la habitación.</li>
+              <li><b>Inventario y tarifa</b> → rate-availability es el árbitro; nadie más reserva stock.</li>
+              <li><b>Reserva</b> → booking; el resto lee por HTTP o reacciona a sus eventos.</li>
+              <li><b>Llegada y folio</b> → front-desk y billing, cada uno con su base.</li>
+              <li><b>Puntos</b> → loyalty; user solo los muestra en el perfil.</li>
+            </ul>
+            <p class="panel-note">Cada frontera coincide con un equipo de despliegue: si dos servicios comparten tabla, en realidad es un servicio con dos nombres.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · Eventos y outbox -->
+    <section class="slide" data-title="Eventos y outbox">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Eventos y outbox</h2>
+            <p class="head-sub">Momento 3 de 5 — Mensajería que no pierde hechos</p>
+          </div>
+        </div>
+        <span class="head-tag">hotelsync.events · topic</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="event-layout">
+          <div class="track reveal" style="--d:0">
+            <div class="track-node">
+              <span class="track-num">01 · Outbox</span>
+              <h3>El hecho y el evento, juntos</h3>
+              <p>El cambio de dominio y la fila <code>pending</code> se escriben en la misma transacción.</p>
+            </div>
+            <div class="track-arrow">→</div>
+            <div class="track-node">
+              <span class="track-num">02 · Dispatcher</span>
+              <h3>Cada 5–10 segundos</h3>
+              <p>Toma pendientes, publica en el exchange y marca <code>sent</code>.</p>
+            </div>
+            <div class="track-arrow">→</div>
+            <div class="track-node track-node--key">
+              <span class="track-num">03 · Exchange</span>
+              <h3><code>hotelsync.events</code></h3>
+              <p>Tipo topic; una cola por consumidor y su gemela <code>&lt;cola&gt;.dlq</code>.</p>
+            </div>
+            <div class="track-arrow">→</div>
+            <div class="track-node">
+              <span class="track-num">04 · Consumidor</span>
+              <h3>Ack manual, retry acotado</h3>
+              <p>Backoff 2 s / 15 s / 60 s con <code>x-retry-count</code>; al cuarto intento, DLQ.</p>
+            </div>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">13 eventos canónicos · 9 colas</p>
+            <ul class="mini-list">
+              <li><b>7 publican / 8 consumen</b>; el acoplamiento real se concentra en booking, payment y front-desk.</li>
+              <li><b>Idempotencia</b> por clave natural: <code>booking_id</code> único en llegadas, folios y puntos.</li>
+              <li><b>Claves compuestas</b>: <code>(booking_id, type)</code> en loyalty; <code>ProcessedEvent</code> y <code>AppliedKey</code> en R&amp;A.</li>
+              <li><b>Sin broker</b> el outbox queda <code>pending</code> y la operación continúa: nadie pierde la reserva.</li>
+              <li><b>Sin <code>schema_version</code></b>: el contrato se sostiene por convención y pruebas, no por metadato.</li>
+            </ul>
+            <div class="ev-groups">
+              <div class="ev-group">
+                <b>Reserva y pago</b>
+                <code>booking.created / confirmed</code>
+                <code>booking.cancelled / paid</code>
+                <code>payment.completed / refunded</code>
+              </div>
+              <div class="ev-group">
+                <b>Operación y métricas</b>
+                <code>checkout.completed · booking.completed</code>
+                <code>folio.closed · metrics.updated</code>
+                <code>physical-room.created</code>
+                <code>availability.updated · rate.updated</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · Recorrido crítico -->
+    <section class="slide" data-title="Recorrido crítico">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Recorrido crítico</h2>
+            <p class="head-sub">Momento 3 de 5 — De la búsqueda al check-out</p>
+          </div>
+        </div>
+        <span class="head-tag">Saga + consistencia eventual</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="cols cols--2">
+          <div class="panel reveal" style="--d:0">
+            <p class="panel-kicker">Seis pasos</p>
+            <ul class="steps">
+              <li class="step-item">
+                <span class="step-num">1</span>
+                <div>
+                  <h3>Buscar</h3>
+                  <p>Disponibilidad y precio desde <code>rate-availability</code>; Redis cachea la consulta.</p>
+                </div>
+                <span class="state-chip">200</span>
+              </li>
+              <li class="step-item">
+                <span class="step-num">2</span>
+                <div>
+                  <h3>Reservar</h3>
+                  <p>booking crea <code>pending</code> y valida contra R&amp;A: todavía no compromete stock.</p>
+                </div>
+                <span class="state-chip">pending</span>
+              </li>
+              <li class="step-item">
+                <span class="step-num">3</span>
+                <div>
+                  <h3>Pagar</h3>
+                  <p>payment registra la transacción y publica <code>payment.completed</code>.</p>
+                </div>
+                <span class="state-chip">payment</span>
+              </li>
+              <li class="step-item">
+                <span class="step-num">4</span>
+                <div>
+                  <h3>Confirmar</h3>
+                  <p>booking confirma con versión optimista y reserva inventario con clave de idempotencia.</p>
+                </div>
+                <span class="state-chip">confirmed</span>
+              </li>
+              <li class="step-item">
+                <span class="step-num">5</span>
+                <div>
+                  <h3>Llegar</h3>
+                  <p>front-desk crea la llegada; el check-in exige <code>confirmed</code> y no admite doble registro.</p>
+                </div>
+                <span class="state-chip">checked_in</span>
+              </li>
+              <li class="step-item">
+                <span class="step-num">6</span>
+                <div>
+                  <h3>Salir</h3>
+                  <p><code>checkout.completed</code> dispara limpieza, cierre de folio y acreditación de puntos.</p>
+                </div>
+                <span class="state-chip">checked_out</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="panel reveal" style="--d:2">
+            <p class="panel-kicker">Invariantes que sostienen el flujo</p>
+            <div class="state-flow">
+              <span>pending</span><i>→</i><span>confirmed</span><i>→</i><span>checked_in</span><i>→</i><span>checked_out</span>
+              <i>|</i><span>cancelled</span>
+            </div>
+            <ul class="mini-list" style="margin-top:12px">
+              <li><b>409</b> si dos confirmaciones compiten por la misma versión de la reserva.</li>
+              <li><b>Saga</b> booking ↔ R&amp;A: un reconciliador reintenta cada 15 s con la misma clave.</li>
+              <li><b>Pago primero</b>: si falta inventario, el pago queda registrado y la saga reintenta la confirmación.</li>
+              <li><b>Sin doble check-in</b>: <code>booking_id</code> UNIQUE en arrivals; el segundo intento falla con 409.</li>
+              <li><b>Check-out parcial</b>: la limpieza puede fallar sin bloquear el folio ni los puntos.</li>
+            </ul>
+            <p class="panel-note">El sistema no promete una transacción distribuida; promete que cada paso falla de forma visible y se puede repetir sin duplicar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · Calidad y CI -->
+    <section class="slide" data-title="Calidad y CI">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Calidad y CI</h2>
+            <p class="head-sub">Momento 4 de 5 — Cómo se sostiene el sistema</p>
+          </div>
+        </div>
+        <span class="head-tag">GitHub Actions · 11 pipelines</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="quality-layout">
+          <div class="metric-row reveal" style="--d:0">
+            <div class="metric">
+              <span class="metric-value">399</span>
+              <span class="metric-label">pruebas backend</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">110</span>
+              <span class="metric-label">pruebas de frontend</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">48</span>
+              <span class="metric-label">suites activas</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">11</span>
+              <span class="metric-label">pipelines por split</span>
+            </div>
+          </div>
+
+          <div class="cols cols--2">
+            <div class="panel reveal" style="--d:2">
+              <p class="panel-kicker">Qué se prueba</p>
+              <ul class="mini-list">
+                <li><b>Contratos HTTP</b> por servicio con supertest y seeds deterministas.</li>
+                <li><b>Idempotencia</b> de consumidores: replay del mismo evento no duplica cargos ni puntos.</li>
+                <li><b>Flujos de reserva</b>: pending, 409 por versión, saga con inventario agotado.</li>
+                <li><b>Guards por rol</b>: un recepcionista no entra al tablero de gerencia.</li>
+                <li><b>Analytics</b>: ETL idempotente por <code>(hotel_id, date)</code>.</li>
+              </ul>
+              <p class="panel-note">Cada split conserva sus pruebas: el servicio desplegado y el que se prueba son el mismo árbol.</p>
+            </div>
+
+            <div class="panel reveal" style="--d:4">
+              <p class="panel-kicker">Qué corre en cada push</p>
+              <ul class="mini-list">
+                <li><b>tsc --noEmit</b> como lint; sin reglas de estilo que nadie lea.</li>
+                <li><b>npm test</b> con Vitest por servicio y en el front.</li>
+                <li><b>npm run build</b> y <code>prisma generate</code> antes del typecheck.</li>
+                <li><b>Matriz por servicio</b>: un pipeline independiente por repositorio.</li>
+                <li><b>Deploy</b> automático a Render y Vercel al pasar la rama principal.</li>
+              </ul>
+              <p class="panel-note">Lo que falta, dicho claro: sin E2E de navegador, sin staging y sin pruebas de carga.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · Despliegue en producción -->
+    <section class="slide" data-title="Despliegue en producción">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Despliegue en producción</h2>
+            <p class="head-sub">Momento 4 de 5 — Once servicios en free tier</p>
+          </div>
+        </div>
+        <span class="head-tag">Render · Neon · Vercel</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="deploy-layout">
+          <div class="panel table-panel reveal" style="--d:0">
+            <p class="panel-kicker">Un repositorio, un servicio, una base</p>
+            <div class="deploy-rows">
+              <div class="deploy-row deploy-row--head">
+                <span>Servicio</span>
+                <span>Repositorio</span>
+                <span>Base de datos</span>
+                <span>Salud</span>
+              </div>
+              <div class="deploy-row">
+                <b>property</b>
+                <span>hotelsync-property-service</span>
+                <span>hotelsync-property-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>rate-availability</b>
+                <span>hotelsync-rate-availability-service</span>
+                <span>hotelsync-rate-availability-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>user</b>
+                <span>hotelsync-user-service</span>
+                <span>hotelsync-user-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>booking</b>
+                <span>hotelsync-booking-service</span>
+                <span>hotelsync-booking-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>front-desk</b>
+                <span>hotelsync-front-desk-service</span>
+                <span>hotelsync-front-desk-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>housekeeping</b>
+                <span>hotelsync-housekeeping-service</span>
+                <span>hotelsync-housekeeping-db</span>
+                <span>health bloqueado por el broker</span>
+              </div>
+              <div class="deploy-row">
+                <b>billing</b>
+                <span>hotelsync-billing-service</span>
+                <span>hotelsync-billing-db</span>
+                <span>health bloqueado por el broker</span>
+              </div>
+              <div class="deploy-row">
+                <b>channel-manager</b>
+                <span>hotelsync-channel-manager</span>
+                <span>hotelsync-channel-manager-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>loyalty</b>
+                <span>hotelsync-loyalty-service</span>
+                <span>hotelsync-loyalty-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>payment</b>
+                <span>hotelsync-payment-service</span>
+                <span>hotelsync-payment-db</span>
+                <strong>200</strong>
+              </div>
+              <div class="deploy-row">
+                <b>analytics</b>
+                <span>hotelsync-analytics-service</span>
+                <span>hotelsync-analytics-db</span>
+                <strong>200</strong>
+              </div>
+            </div>
+            <p class="split-note">Los repositorios viven en <code>github.com/iI3lue/hotelsync-*</code>; el front es <code>hotelsync-front</code> en Vercel.</p>
+          </div>
+
+          <div class="chips reveal" style="--d:2">
+            <span class="chip"><span class="dot dot--brass"></span>Render free</span>
+            <span class="chip"><span class="dot dot--brass"></span>Neon Postgres</span>
+            <span class="chip"><span class="dot dot--ink"></span>Vercel</span>
+            <span class="chip"><span class="dot dot--ink"></span>CloudAMQP</span>
+            <span class="chip"><span class="dot dot--stone"></span>spin-down 15 min</span>
+            <span class="chip"><span class="dot dot--stone"></span>cold start 30–90 s</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · Demo en producción -->
+    <section class="slide" data-title="Demo en producción">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Demo en producción</h2>
+            <p class="head-sub">Momento 5 de 5 — Hotel Sync Centro · datos reales en producción</p>
+          </div>
+        </div>
+        <span class="head-tag">hotelsync-front.vercel.app</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="shots">
+          <article class="shot reveal" style="--d:0">
+            <div class="shot-head">
+              <span class="shot-tag">GUEST</span>
+              <span class="shot-path">/hotels/{id}/availability</span>
+            </div>
+            <div class="shot-frame">
+              <img src="assets/demo/guest-availability.png" alt="Disponibilidad por fecha en Hotel Sync Centro" loading="lazy">
+            </div>
+            <p class="shot-note">Búsqueda pública sin login: fechas, huéspedes y tipos de habitación con el precio del día.</p>
+          </article>
+
+          <article class="shot reveal" style="--d:1">
+            <div class="shot-head">
+              <span class="shot-tag">RECEPTIONIST</span>
+              <span class="shot-path">/admin/recepcion</span>
+            </div>
+            <div class="shot-frame">
+              <img src="assets/demo/receptionist-checkin.png" alt="Recepción y check-in con reservas confirmadas" loading="lazy">
+            </div>
+            <p class="shot-note">46 reservas del hotel demo filtradas por estado; el check-in exige una reserva confirmada.</p>
+          </article>
+
+          <article class="shot reveal" style="--d:2">
+            <div class="shot-head">
+              <span class="shot-tag">HOUSEKEEPER</span>
+              <span class="shot-path">/admin/housekeeping</span>
+            </div>
+            <div class="shot-frame">
+              <img src="assets/demo/housekeeper-queue.png" alt="Cola de limpieza del hotel" loading="lazy">
+            </div>
+            <p class="shot-note">Cola del hotel al día: las tareas nacen del checkout.completed, con prioridad por salida y solo del hotel asignado.</p>
+          </article>
+
+          <article class="shot reveal" style="--d:3">
+            <div class="shot-head">
+              <span class="shot-tag">MANAGER</span>
+              <span class="shot-path">/admin/analytics</span>
+            </div>
+            <div class="shot-frame">
+              <img src="assets/demo/manager-revenue.png" alt="Dashboard de revenue con ocupación, ADR y RevPAR" loading="lazy">
+            </div>
+            <p class="shot-note">Ocupación media 17,6 %, ADR $8.500 y RevPAR $1.495 sobre 13 días con datos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · Conclusiones -->
+    <section class="slide" data-title="Conclusiones y próximos pasos">
+      <header class="slide-head">
+        <div class="head-left">
+          <svg class="head-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#hs-mark"></use></svg>
+          <span class="head-divider"></span>
+          <div>
+            <h2 class="head-title">Conclusiones y próximos pasos</h2>
+            <p class="head-sub">Cierre — Lo entregado, lo asumido y lo que sigue</p>
+          </div>
+        </div>
+        <span class="head-tag">HotelSync</span>
+      </header>
+
+      <div class="slide-body">
+        <div class="closing">
+          <div class="closing-panels">
+            <div class="panel reveal" style="--d:0">
+              <p class="panel-kicker">Lo entregado</p>
+              <ul class="mini-list">
+                <li>Once servicios desplegados y verificados en producción.</li>
+                <li>Once bases con 41 modelos y cero claves foráneas cruzadas.</li>
+                <li>399 pruebas backend y 110 de frontend en 11 pipelines.</li>
+                <li>Demo con datos reales por rol, no un mockup.</li>
+              </ul>
+            </div>
+            <div class="panel reveal" style="--d:1">
+              <p class="panel-kicker">Límites asumidos</p>
+              <ul class="mini-list">
+                <li>Free tier con spin-down y arranque en frío.</li>
+                <li>Pagos simulados: no hay pasarela ni conciliación real.</li>
+                <li>Un solo entorno: sin staging ni E2E de navegador.</li>
+                <li>Sin trazas distribuidas ni alertas operativas.</li>
+              </ul>
+            </div>
+            <div class="panel reveal" style="--d:2">
+              <p class="panel-kicker">Próximos pasos</p>
+              <ul class="mini-list">
+                <li>Pasarela real con webhooks firmados e idempotencia.</li>
+                <li><code>schema_version</code> en cada evento del outbox.</li>
+                <li>Staging, E2E y pruebas de carga sobre el flujo crítico.</li>
+                <li>Rate limit distribuido en Redis para más de una instancia.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="statement reveal" style="--d:3">
+            <p>La arquitectura no se demuestra con un diagrama: se demuestra cuando un <em>check-out</em> dispara limpieza, factura y puntos sin que nadie los pida.</p>
+            <span>Arquitectura de Plataformas Tecnológicas · 2026</span>
+          </div>
+
+          <div class="closing-band reveal" style="--d:4">
+            <div class="links">
+              <a class="link-chip" href="https://hotelsync-front.vercel.app" target="_blank" rel="noreferrer">Demo <b>hotelsync-front.vercel.app</b></a>
+              <a class="link-chip" href="https://hotelsync-api-gateway-tu1c.onrender.com/health" target="_blank" rel="noreferrer">Gateway <b>/health</b></a>
+              <a class="link-chip" href="https://github.com/iI3lue" target="_blank" rel="noreferrer">Código <b>github.com/iI3lue</b></a>
+            </div>
+            <span class="thanks">Gracias.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="deck.js"></script>
+</body>
+</html>
